@@ -1,0 +1,118 @@
+export default function QuestionCard({
+  question,
+  updateQuestion,
+  deleteQuestion,
+}) {
+  const handleOptionChange = (index, value) => {
+    const newOptions = [...question.options];
+    newOptions[index] = value;
+    updateQuestion(question.id, { options: newOptions });
+  };
+
+  const addOption = () => {
+    updateQuestion(question.id, {
+      options: [...question.options, `Option ${question.options.length + 1}`],
+    });
+  };
+
+  return (
+    <div className="bg-white rounded-xl shadow-md p-6 mb-6">
+
+      {/* Title + Type */}
+      <div className="flex justify-between items-center mb-4">
+        <input
+          value={question.title}
+          onChange={(e) =>
+            updateQuestion(question.id, { title: e.target.value })
+          }
+          className="text-lg w-full outline-none"
+        />
+
+        <select
+          value={question.type}
+          onChange={(e) =>
+            updateQuestion(question.id, { type: e.target.value })
+          }
+          className="ml-4 border p-2 rounded-md"
+        >
+          <option value="multiple_choice">Multiple Choice</option>
+          <option value="short_answer">Short Answer</option>
+          <option value="paragraph">Paragraph</option>
+          <option value="yes_no">Yes / No</option>
+        </select>
+      </div>
+
+      {/* Multiple Choice */}
+      {question.type === "multiple_choice" && (
+        <div>
+          {question.options.map((opt, i) => (
+            <input
+              key={i}
+              value={opt}
+              onChange={(e) =>
+                handleOptionChange(i, e.target.value)
+              }
+              className="block w-full mb-2 border-b outline-none"
+            />
+          ))}
+
+          <button
+            onClick={addOption}
+            className="text-purple-600 text-sm"
+          >
+            + Add Option
+          </button>
+        </div>
+      )}
+
+      {/* Short Answer */}
+      {question.type === "short_answer" && (
+        <input
+          disabled
+          placeholder="Short answer text"
+          className="w-full border-b outline-none"
+        />
+      )}
+
+      {/* Paragraph */}
+      {question.type === "paragraph" && (
+        <textarea
+          disabled
+          placeholder="Long answer text"
+          className="w-full border-b outline-none"
+        />
+      )}
+
+      {/* Yes / No */}
+      {question.type === "yes_no" && (
+        <div className="flex gap-6 text-gray-600">
+          <span>○ Yes</span>
+          <span>○ No</span>
+        </div>
+      )}
+
+      {/* Required Toggle */}
+      <div className="flex justify-between items-center mt-4">
+        <button
+          onClick={() => deleteQuestion(question.id)}
+          className="text-red-500 text-sm"
+        >
+          Delete
+        </button>
+
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={question.required}
+            onChange={(e) =>
+              updateQuestion(question.id, {
+                required: e.target.checked,
+              })
+            }
+          />
+          Required
+        </label>
+      </div>
+    </div>
+  );
+}
