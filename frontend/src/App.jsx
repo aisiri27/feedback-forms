@@ -20,86 +20,89 @@ function ProtectedRoute({ children }) {
 export default function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/public/:id" element={<PublicForm />} />
-        <Route path="/form/:id/public" element={<PublicForm />} />
-        <Route path="/feedback" element={<UserFeedback />} />
-        <Route path="/event/:publicLink" element={<EventPublicFeedback />} />
-        <Route
-          path="/events/feedback"
-          element={(
-            <ProtectedRoute>
-              <EventFeedbackHub />
-            </ProtectedRoute>
-          )}
-        />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route
-          path="/analytics"
-          element={(
-            <ProtectedRoute>
-              <Analytics />
-            </ProtectedRoute>
-          )}
-        />
-        <Route
-          path="/analytics/:id"
-          element={(
-            <ProtectedRoute>
-              <Analytics />
-            </ProtectedRoute>
-          )}
-        />
-        <Route
-          path="/forms/create"
-          element={(
-            <ProtectedRoute>
-              <CreateFormRedirect />
-            </ProtectedRoute>
-          )}
-        />
-        <Route
-          path="/events/analytics"
-          element={(
-            <ProtectedRoute>
-              <EventAnalyticsDashboard />
-            </ProtectedRoute>
-          )}
-        />
-        <Route
-          path="/form/:id"
-          element={(
-            <ProtectedRoute>
-              <FormBuilder />
-            </ProtectedRoute>
-          )}
-        />
-        <Route
-          path="/"
-          element={(
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          )}
-        />
-        <Route
-          path="/events/admin"
-          element={(
-            <ProtectedRoute>
-              <EventAdminDashboard />
-            </ProtectedRoute>
-          )}
-        />
-        <Route
-          path="/legacy/forms"
-          element={(
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          )}
-        />
-      </Routes>
+      <a href="#main-content" className="skip-link">Skip to main content</a>
+      <main id="main-content">
+        <Routes>
+          <Route path="/public/:id" element={<PublicForm />} />
+          <Route path="/form/:id/public" element={<PublicForm />} />
+          <Route path="/feedback" element={<UserFeedback />} />
+          <Route path="/event/:publicLink" element={<EventPublicFeedback />} />
+          <Route
+            path="/events/feedback"
+            element={(
+              <ProtectedRoute>
+                <EventFeedbackHub />
+              </ProtectedRoute>
+            )}
+          />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route
+            path="/analytics"
+            element={(
+              <ProtectedRoute>
+                <Analytics />
+              </ProtectedRoute>
+            )}
+          />
+          <Route
+            path="/analytics/:id"
+            element={(
+              <ProtectedRoute>
+                <Analytics />
+              </ProtectedRoute>
+            )}
+          />
+          <Route
+            path="/forms/create"
+            element={(
+              <ProtectedRoute>
+                <CreateFormRedirect />
+              </ProtectedRoute>
+            )}
+          />
+          <Route
+            path="/events/analytics"
+            element={(
+              <ProtectedRoute>
+                <EventAnalyticsDashboard />
+              </ProtectedRoute>
+            )}
+          />
+          <Route
+            path="/form/:id"
+            element={(
+              <ProtectedRoute>
+                <FormBuilder />
+              </ProtectedRoute>
+            )}
+          />
+          <Route
+            path="/"
+            element={(
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            )}
+          />
+          <Route
+            path="/events/admin"
+            element={(
+              <ProtectedRoute>
+                <EventAdminDashboard />
+              </ProtectedRoute>
+            )}
+          />
+          <Route
+            path="/legacy/forms"
+            element={(
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            )}
+          />
+        </Routes>
+      </main>
     </BrowserRouter>
   );
 }

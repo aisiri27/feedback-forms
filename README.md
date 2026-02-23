@@ -68,6 +68,28 @@ Important:
 - `VITE_` prefix is required for frontend env values.
 - Restart Vite server after editing env files.
 
+### 3.3 Credentials to Run Normally
+
+You have 2 ways to log in during development:
+
+1. Demo login (quickest)
+- Email: `demo@chiac.local`
+- Password: `Demo@123`
+
+2. Normal user login
+- Open `/register`
+- Create your own email/password account
+- Then log in from `/login`
+
+Google login:
+- Requires valid Google OAuth client ID in both env files:
+  - `backend/.env -> GOOGLE_CLIENT_ID`
+  - `frontend/.env -> VITE_GOOGLE_CLIENT_ID`
+
+Security note:
+- Do not put real secrets in `*.env.example`.
+- Keep real values only in local `backend/.env` and `frontend/.env` (these are git-ignored).
+
 ## 4) Run Locally (Step by Step)
 
 ### 4.1 Start backend
@@ -225,6 +247,13 @@ Backend quick route check:
 node -e "require('./backend/routes/forms'); require('./backend/routes/auth'); console.log('ok')"
 ```
 
+Backend integration tests:
+
+```bash
+cd backend
+npm test
+```
+
 ## 10) Troubleshooting
 
 ### Google button says disabled
@@ -248,6 +277,16 @@ node -e "require('./backend/routes/forms'); require('./backend/routes/auth'); co
 
 - Expected in in-memory mode after backend restart
 
+### Security checks
+
+- Run local secret scan:
+
+```bash
+git grep -nE "client_secret|JWT_SECRET=|mongodb\+srv|AIza|PRIVATE KEY|apps\.googleusercontent\.com"
+```
+
+- See `SECURITY.md` for leak-response and history cleanup commands.
+
 ## 11) Current Status
 
 - Core form flow: implemented
@@ -256,6 +295,8 @@ node -e "require('./backend/routes/forms'); require('./backend/routes/auth'); co
 - Form deletion: implemented
 - Google OAuth in active login flow: implemented
 - Local in-memory mode: enabled by default
+- Backend integration tests: enabled (`node --test`)
+- Secret scanning guardrail: enabled via GitHub Action
 
 ## 12) License
 
