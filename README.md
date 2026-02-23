@@ -10,6 +10,157 @@ It includes:
 
 The default local workflow uses **in-memory storage** (no MongoDB required).
 
+## About the Project
+
+LumaForms is designed to help organizers collect structured feedback and turn responses into actionable insights quickly.
+The product has two main experiences:
+
+- Admin experience: create/publish forms, share links, and monitor analytics
+- Public experience: submit feedback easily from a public link (anonymous or named)
+
+This repo is optimized for local development and demos:
+- Fast setup
+- No database dependency in default mode
+- Real API contracts and auth flow for production migration later
+
+## System Architecture
+
+### High-level architecture
+
+```text
+[React Frontend (Vite)]
+        |
+        | HTTP (REST)
+        v
+[Express API Layer]
+  |     |       |
+  |     |       +--> Auth routes (/auth)
+  |     +----------> Form/Response routes (/forms, /responses)
+  +----------------> Event routes (/api/events)
+
+        |
+        v
+[Storage Layer]
+  - In-memory store (default local mode)
+  - Mongo-compatible models (optional future mode)
+```
+
+### Runtime request flow
+
+1. Frontend sends request with optional JWT (`Authorization: Bearer ...`).
+2. Express route validates auth/ownership and payload.
+3. Business logic runs in route layer (`forms`, `responses`, `events`, `auth`).
+4. Data is read/written to in-memory store (or Mongo model if configured).
+5. API returns normalized response object to frontend.
+6. UI renders cards/charts and interaction state from returned payload.
+
+### Sequence diagram (end-to-end flow)
+
+```mermaid
+sequenceDiagram
+    participant A as Admin User
+    participant F as Frontend (React)
+    participant API as Backend API (Express)
+    participant S as Storage (In-memory)
+    participant P as Public User
+
+    A->>F: Login
+    F->>API: POST /auth/login (or /auth/google)
+    API->>S: Validate/Create user session data
+    API-->>F: JWT + user payload
+
+    A->>F: Create form (title/questions)
+    F->>API: POST /forms
+    API->>S: Save draft form
+    API-->>F: Created form
+
+    A->>F: Publish form
+    F->>API: POST /forms/:id/publish
+    API->>S: Mark form as published
+    API-->>F: Public-ready form link
+
+    P->>F: Open /form/:id/public
+    F->>API: GET /forms/:id
+    API->>S: Read published form
+    API-->>F: Form schema
+
+    P->>F: Submit response
+    F->>API: POST /responses/:formId
+    API->>S: Save response
+    API-->>F: Submission success
+
+    A->>F: Open analytics
+    F->>API: GET /forms/:id/analytics
+    API->>S: Aggregate responses
+    API-->>F: Metrics + charts + insights
+```
+
+### Sequence diagram (event flow)
+
+```mermaid
+sequenceDiagram
+    participant E as Event Admin
+    participant F as Frontend (React)
+    participant API as Backend API (Express)
+    participant S as Storage (In-memory)
+    participant U as Public User
+
+    E->>F: Create Event (title/description)
+    F->>API: POST /api/events
+    API->>S: Save event + publicLink
+    API-->>F: Event created
+
+    E->>F: View own events
+    F->>API: GET /api/events/mine
+    API->>S: Fetch events by owner
+    API-->>F: Event list + summary metrics
+
+    U->>F: Open /event/:publicLink
+    F->>API: GET /api/events/public/:publicLink
+    API->>S: Read active event
+    API-->>F: Event feedback form
+
+    U->>F: Submit rating + comment
+    F->>API: POST /api/events/public/:publicLink/feedback
+    API->>S: Save event feedback row
+    API-->>F: Submission success
+
+    E->>F: Open event analytics
+    F->>API: GET /api/events/:id/analytics
+    API->>S: Aggregate event feedback
+    API-->>F: Avg rating + total responses + distribution + comments
+```
+
+### Backend component map
+
+- `backend/app.js`
+  - App wiring, middleware registration, route mounting
+- `backend/server.js`
+  - Process startup, optional Mongo connection bootstrap
+- `backend/middleware/`
+  - `authMiddleware.js` for JWT gating
+  - `requestLogger.js` for per-request logging
+  - `errorHandler.js` for 404 + centralized error responses
+- `backend/routes/`
+  - `auth.js` auth endpoints
+  - `forms.js` form lifecycle + analytics
+  - `responses.js` public response intake
+  - `eventRoutes.js` event-centric flow
+- `backend/lib/inMemoryStore.js`
+  - Default storage in local mode
+
+### Frontend component map
+
+- `frontend/src/App.jsx`
+  - Route table and protected routes
+- `frontend/src/pages/`
+  - `Dashboard.jsx`, `FormBuilder.jsx`, `PublicForm.jsx`, `Analytics.jsx`
+  - Event pages (`EventAdminDashboard.jsx`, `EventPublicFeedback.jsx`, etc.)
+- `frontend/src/api.js`
+  - Axios instance + auth header interceptor
+- `frontend/src/index.css`
+  - Glass palette, typography, tokens, accessibility focus styles
+
 ## 1) Prerequisites
 
 Install:
