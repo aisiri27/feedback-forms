@@ -7,21 +7,13 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "preview:e2e": "vite preview --host 127.0.0.1 --port 4173 --strictPort",
-    "test:e2e": "start-server-and-test preview:e2e http://127.0.0.1:4173 \"node tests/e2e/dashboard.selenium.mjs\""
+    "preview": "vite preview"
   },
   "dependencies": {
-<<<<<<< HEAD
-    "chart.js": "^4.5.1",
-=======
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
-    "@react-oauth/google": "^0.13.4",
     "axios": "^1.13.5",
-    "jwt-decode": "^4.0.0",
->>>>>>> ac241a3 (Working authentication, form builder UI, partial backend integration)
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.13.0"
@@ -32,22 +24,13 @@
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
-<<<<<<< HEAD
-    "chromedriver": "^144.0.1",
-=======
     "autoprefixer": "^10.4.24",
->>>>>>> ac241a3 (Working authentication, form builder UI, partial backend integration)
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",
-<<<<<<< HEAD
-    "selenium-webdriver": "^4.40.0",
-    "start-server-and-test": "^2.1.3",
-=======
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.18",
->>>>>>> ac241a3 (Working authentication, form builder UI, partial backend integration)
     "vite": "^7.3.1"
   }
 }

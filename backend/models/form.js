@@ -10,7 +10,26 @@ const questionSchema = new mongoose.Schema({
 const formSchema = new mongoose.Schema({
   title: String,
   description: String,
+  aiPrompt: {
+    type: String,
+    default: "",
+  },
   questions: [questionSchema],
+  submissionSettings: {
+    allowAnonymous: {
+      type: Boolean,
+      default: true,
+    },
+    allowNamed: {
+      type: Boolean,
+      default: true,
+    },
+  },
+  status: {
+    type: String,
+    enum: ["draft", "published"],
+    default: "draft",
+  },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",

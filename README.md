@@ -1,143 +1,262 @@
-# Feedback Forms (MERN Stack)
+# LumaForms
 
-Full-stack feedback collection system for events/courses with Google login, public submissions, MongoDB storage, and per-event analytics dashboards.
+LumaForms is a full-stack feedback platform for events and courses.
+It includes:
+- Auth (email/password + Google OAuth)
+- Form builder with AI template generation
+- Public response collection
+- Interactive analytics dashboard
+- Glossy glassmorphism UI
 
-## Project Scope
+The default local workflow uses **in-memory storage** (no MongoDB required).
 
-- Google OAuth login
-- Logged-in users can create Events/Courses
-- Each Event has a Feedback Form
-- Questions support ratings (core) + optional text
-- Public feedback submission links
-- Secure MongoDB storage
-- Per-event dashboard with:
-- average rating
-- total responses
-- rating distribution charts
+## 1) Prerequisites
 
-## Role Distribution (5 Members)
+Install:
+- Node.js 18+ (recommended 20+)
+- npm 9+
 
-1. Frontend Engineer (Form Builder + Submission)
-- Auth-aware UI states
-- Event creation/list UI
-- Feedback form builder (rating + optional text + required toggle)
-- Public submission page and validation
+Optional:
+- Google Cloud project (for Google login)
 
-2. Backend Engineer (API + Business Logic)
-- REST endpoints for events/forms/responses
-- Ownership/permission checks
-- Validation and middleware-based security
-- API documentation
+## 2) Project Structure
 
-3. Database Engineer (MongoDB + Data Modeling)
-- Schemas/relationships for users/events/forms/questions/responses
-- Indexing and aggregation optimization
-- Data integrity and timestamped records
-
-4. Auth & Deployment Engineer
-- Google OAuth integration
-- Route protection and session/token handling
-- Frontend/backend deployment and env setup
-
-5. Analytics & Dashboard Engineer
-- Dashboard metrics (total responses, average rating, distribution)
-- Chart implementation and empty-state handling
-- Raw response to chart-ready transformation
-
-## Current Analytics Work (Completed)
-
-Your implemented analytics layer includes:
-
-- Dashboard UI with metric cards + chart grid:
-- `src/components/analytics/AnalyticsDashboard.jsx`
-- Chart rendering lifecycle:
-- `src/charts/render/renderCharts.js`
-- Chart configuration builder:
-- `src/charts/config/buildChartConfigs.js`
-- Analytics data transforms:
-- `src/charts/transformers/analyticsTransformers.js`
-- Metric transforms:
-- `src/charts/transformers/metricsTransformers.js`
-- Chart layout constants:
-- `src/charts/constants/chartLayout.js`
-- Barrel exports:
-- `src/charts/index.js`
-- Dummy dataset:
-- `src/data/dummyAnalyticsData.js`
-- API fetch adapter:
-- `src/data/fetchAnalyticsData.js`
-
-## Definition of Done Status (Analytics Role)
-
-- Dashboard metrics implemented
-- Bar/distribution charts implemented with Chart.js
-- Empty state implemented
-- Data transformation layer implemented
-- Auto-refresh polling and API fallback implemented
-- Selenium e2e checks implemented and passing
-
-## API Integration Flow
-
-- `frontend/src/App.jsx` tries to fetch analytics from API.
-- If API fails, app falls back to dummy data for uninterrupted frontend work.
-- Polling runs every 30 seconds so dashboard can update when new feedback arrives.
-
-Use `.env` when backend is ready:
-
-```bash
-VITE_API_BASE_URL=http://localhost:5000
-VITE_ANALYTICS_ENDPOINT=/api/analytics/overview
+```text
+feedback-forms/
+  backend/
+    lib/
+    middleware/
+    models/
+    routes/
+    server.js
+  frontend/
+    src/
+      pages/
+      auth/
+      App.jsx
+      index.css
+    index.html
+  README.md
 ```
 
-## Development Scripts
+## 3) Environment Setup (Step by Step)
+
+### 3.1 Backend env
+
+Create `backend/.env`:
+
+```env
+PORT=5000
+JWT_SECRET=replace-with-a-strong-random-secret
+GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
+```
+
+Notes:
+- Leave `MONGO_URI` empty to run local in-memory mode.
+- In-memory mode means data resets when backend restarts.
+
+### 3.2 Frontend env
+
+Create `frontend/.env`:
+
+```env
+VITE_API_BASE_URL=http://127.0.0.1:5000
+VITE_GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
+```
+
+Important:
+- `VITE_` prefix is required for frontend env values.
+- Restart Vite server after editing env files.
+
+## 4) Run Locally (Step by Step)
+
+### 4.1 Start backend
+
+```bash
+cd backend
+npm install
+npm run dev
+```
+
+Expected:
+- Backend starts on `http://127.0.0.1:5000`
+
+### 4.2 Start frontend
 
 ```bash
 cd frontend
 npm install
 npm run dev
+```
+
+Expected:
+- Frontend starts on `http://127.0.0.1:5173` (or Vite-selected port)
+
+### 4.3 Open app
+
+- Main app: `http://127.0.0.1:5173`
+- Login page: `http://127.0.0.1:5173/login`
+
+## 5) Google OAuth Setup (Step by Step)
+
+1. Go to `https://console.cloud.google.com/`
+2. Create/select a project
+3. Configure OAuth consent screen
+4. Create OAuth Client ID (Web application)
+5. Add authorized JavaScript origins:
+   - `http://localhost:5173`
+   - `http://127.0.0.1:5173`
+6. Copy Client ID
+7. Set same value in:
+   - `backend/.env -> GOOGLE_CLIENT_ID`
+   - `frontend/.env -> VITE_GOOGLE_CLIENT_ID`
+8. Restart backend + frontend
+
+## 6) Core User Flows
+
+### 6.1 Admin flow
+
+1. Login
+2. Open Dashboard (`/`)
+3. Click `Create New Form`
+4. In Form Builder:
+   - Generate from AI prompt or add questions manually
+   - Save draft
+   - Publish form
+5. Copy/share public link
+6. Track responses in analytics
+
+### 6.2 Public responder flow
+
+1. Open public link: `/form/:id/public`
+2. Choose anonymous or include-name mode
+3. Answer questions
+4. Submit response
+
+### 6.3 Analytics flow
+
+1. Open `/analytics/:id`
+2. Use tabs:
+   - Overview
+   - Question Explorer
+   - Text Insights
+3. Review:
+   - Total responses
+   - Average rating
+   - Rating distribution
+   - Trend + sentiment insights
+
+## 7) Routes Reference
+
+### Frontend routes
+
+- `/` Dashboard
+- `/forms/create` Create form
+- `/form/:id` Builder
+- `/form/:id/public` Public form
+- `/analytics/:id` Form analytics
+- `/login` Login
+- `/register` Register
+
+Event routes:
+- `/events/admin`
+- `/events/feedback`
+- `/event/:publicLink`
+- `/events/analytics`
+
+### Backend API routes
+
+Auth:
+- `POST /auth/register`
+- `POST /auth/login`
+- `POST /auth/google`
+
+Forms:
+- `POST /forms`
+- `GET /forms`
+- `GET /forms/:id`
+- `PUT /forms/:id`
+- `DELETE /forms/:id`
+- `POST /forms/:id/publish`
+- `POST /forms/generate-from-prompt`
+- `GET /forms/:id/analytics`
+
+Responses:
+- `POST /responses/:formId`
+
+Events:
+- `POST /api/events`
+- `GET /api/events/mine`
+- `GET /api/events/public/:publicLink`
+- `POST /api/events/public/:publicLink/feedback`
+- `GET /api/events/:id/analytics`
+
+## 8) Design System
+
+Palette applied:
+- Primary Blue: `#1E3A5F`
+- Secondary Blue: `#87CEEB`
+- Highlight Orange: `#FFA500`
+- Positive Green: `#008080`
+- Light Gray: `#F5F5F5`
+- Off White: `#FAFAFA`
+
+Guidelines used:
+- High text contrast for readability (WCAG-focused)
+- 2-3 dominant colors per screen
+- Blue for trust, orange for energy, green for success
+
+Main style file:
+- `frontend/src/index.css`
+
+## 9) Validation / QA Commands
+
+Frontend:
+
+```bash
+cd frontend
 npm run lint
 npm run build
-npm run test:e2e
 ```
 
-## Project Structure
+Backend quick route check:
 
-```text
-frontend/src/
-  App.jsx
-  App.css
-  index.css
-  main.jsx
-  charts/
-  components/
-  data/
-tests/
-  e2e/
+```bash
+node -e "require('./backend/routes/forms'); require('./backend/routes/auth'); console.log('ok')"
 ```
 
-## Backend Status
+## 10) Troubleshooting
 
-- Backend has been restored on `main`.
-- Team should continue backend development on `main` to avoid branch split with `master`.
-- Quick verification command:
-- `git ls-tree -r --name-only origin/main | findstr /i Backend`
+### Google button says disabled
 
-## Independent Team Workflow
+- Ensure `frontend/.env` exists
+- Ensure `VITE_GOOGLE_CLIENT_ID` is set
+- Restart frontend dev server
 
-```
-[Auth Engineer] -> Access Control
-       |
-       v
-[Frontend] -> [Backend APIs] -> [MongoDB]
-                               |
-                               v
-                        [Analytics Dashboard]
-```
+### Google login fails on backend
 
-## Selenium Notes
+- Ensure `GOOGLE_CLIENT_ID` in backend matches frontend client ID
+- Ensure origin is allowed in Google Console
 
-- `npm run test:e2e` launches Vite preview on `http://127.0.0.1:4173`.
-- Selenium runs headless Chrome and verifies:
-- dashboard heading is visible
-- all 6 chart cards render
-- all 6 chart canvases are visible and sized
+### Old UI still visible
+
+- Confirm correct frontend port (`5173`)
+- Hard refresh browser (`Ctrl + F5`)
+- Restart frontend dev server
+
+### Data disappeared
+
+- Expected in in-memory mode after backend restart
+
+## 11) Current Status
+
+- Core form flow: implemented
+- Public submission: implemented
+- Interactive analytics: implemented
+- Form deletion: implemented
+- Google OAuth in active login flow: implemented
+- Local in-memory mode: enabled by default
+
+## 12) License
+
+MIT License. See `LICENSE`.
