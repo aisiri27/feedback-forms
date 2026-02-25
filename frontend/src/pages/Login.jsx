@@ -3,7 +3,8 @@ import { useNavigate, Link } from "react-router-dom";
 
 const DEMO_EMAIL = "demo@chiac.local";
 const DEMO_PASSWORD = "Demo@123";
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:5000";
+const API_BASE = import.meta.env.VITE_API_BASE_URL
+  || (import.meta.env.DEV ? "http://127.0.0.1:5000" : "");
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
 
 export default function Login() {
@@ -100,7 +101,7 @@ export default function Login() {
         setError(data.message || "Login failed");
       }
     } catch {
-      setError("Unable to reach backend on port 5000");
+      setError("Unable to reach backend. Verify VITE_API_BASE_URL and backend deployment.");
     } finally {
       setIsSubmitting(false);
     }

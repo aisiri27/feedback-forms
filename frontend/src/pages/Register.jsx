@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL
+  || (import.meta.env.DEV ? "http://127.0.0.1:5000" : "");
+
 export default function Register() {
   const navigate = useNavigate();
 
@@ -19,7 +22,7 @@ export default function Register() {
       const trimmedEmail = email.trim();
       const displayName = name.trim() || trimmedEmail.split("@")[0];
 
-      const res = await fetch("http://127.0.0.1:5000/auth/register", {
+      const res = await fetch(`${API_BASE}/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -41,7 +44,7 @@ export default function Register() {
         setError(data.message || "Registration failed");
       }
     } catch {
-      setError("Unable to reach server. Ensure backend is running on port 5000.");
+      setError("Unable to reach backend. Verify VITE_API_BASE_URL and backend deployment.");
     } finally {
       setIsSubmitting(false);
     }
