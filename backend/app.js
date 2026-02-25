@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const helmet = require("helmet");
 
 const authRoutes = require("./routes/auth");
 const formRoutes = require("./routes/forms");
@@ -10,9 +11,24 @@ const requestLogger = require("./middleware/requestLogger");
 const { notFoundHandler, errorHandler } = require("./middleware/errorHandler");
 
 const app = express();
+const allowedOrigins = String(process.env.CORS_ORIGIN || "")
+  .split(",")
+  .map((value) => value.trim())
+  .filter(Boolean);
 
-app.use(cors());
-app.use(express.json());
+app.set("trust proxy", 1);
+app.use(helmet());
+app.use(cors({
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error("Not allowed by CORS"));
+  },
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
+app.use(express.json({ limit: "1mb" }));
 app.use(requestLogger);
 
 app.use("/auth", authRoutes);

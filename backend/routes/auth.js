@@ -2,10 +2,32 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
+const rateLimit = require("express-rate-limit");
 const User = require("../models/user");
 const store = require("../lib/inMemoryStore");
 
 const router = express.Router();
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: "Too many authentication attempts. Try again later." },
+});
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: "Too many login attempts. Try again later." },
+});
+const registerLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: "Too many registration attempts. Try again later." },
+});
 
 function toUserPayload(user) {
   return {
@@ -18,7 +40,7 @@ function toUserPayload(user) {
 }
 
 /* REGISTER */
-router.post("/register", async (req, res) => {
+router.post("/register", authLimiter, registerLimiter, async (req, res) => {
   try {
     const { name, email, password } = req.body;
     const trimmedEmail = (email || "").trim().toLowerCase();
@@ -26,6 +48,9 @@ router.post("/register", async (req, res) => {
 
     if (!trimmedEmail || !password) {
       return res.status(400).json({ message: "Email and password are required" });
+    }
+    if (password.length < 6) {
+      return res.status(400).json({ message: "Password must be at least 6 characters" });
     }
 
     const secret = process.env.JWT_SECRET || "dev-only-secret";
@@ -74,7 +99,7 @@ router.post("/register", async (req, res) => {
 });
 
 /* LOGIN */
-router.post("/login", async (req, res) => {
+router.post("/login", authLimiter, loginLimiter, async (req, res) => {
   try {
     const { email, password } = req.body;
     const trimmedEmail = (email || "").trim().toLowerCase();
@@ -112,7 +137,7 @@ router.post("/login", async (req, res) => {
 });
 
 /* GOOGLE OAUTH */
-router.post("/google", async (req, res) => {
+router.post("/google", authLimiter, loginLimiter, async (req, res) => {
   try {
     const credential = String(req.body.credential || "").trim();
     if (!credential) {

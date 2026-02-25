@@ -5,6 +5,7 @@ const Form = require("../models/form");
 const Response = require("../models/Response");
 const authMiddleware = require("../middleware/authMiddleware");
 const store = require("../lib/inMemoryStore");
+const isDemoEnabled = process.env.NODE_ENV !== "production";
 
 const router = express.Router();
 const POSITIVE_WORDS = ["good", "great", "excellent", "helpful", "clear", "valuable", "amazing", "love", "best", "useful"];
@@ -25,7 +26,7 @@ function getUserIdFromHeader(req) {
   const token = header.startsWith("Bearer ") ? header.slice(7).trim() : header.trim();
 
   if (!token) return null;
-  if (token === "demo-token") return "000000000000000000000001";
+  if (token === "demo-token" && isDemoEnabled) return "000000000000000000000001";
 
   try {
     const secret = process.env.JWT_SECRET || "dev-only-secret";

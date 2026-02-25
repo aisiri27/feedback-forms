@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 
 const DEMO_EMAIL = "demo@chiac.local";
 const DEMO_PASSWORD = "Demo@123";
+const DEMO_ENABLED = import.meta.env.VITE_ENABLE_DEMO_AUTH === "true" || import.meta.env.DEV;
 const API_BASE = import.meta.env.VITE_API_BASE_URL
   || (import.meta.env.DEV ? "http://127.0.0.1:5000" : "");
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
@@ -73,7 +74,7 @@ export default function Login() {
     setIsSubmitting(true);
     setError("");
 
-    if (email.trim().toLowerCase() === DEMO_EMAIL && password === DEMO_PASSWORD) {
+    if (DEMO_ENABLED && email.trim().toLowerCase() === DEMO_EMAIL && password === DEMO_PASSWORD) {
       localStorage.setItem("token", "demo-token");
       localStorage.setItem(
         "user",
@@ -115,20 +116,23 @@ export default function Login() {
         <p className="text-sm text-[var(--color-text-secondary)] mb-6 text-center">
           Sign in to your feedback workspace.
         </p>
-        <p className="text-xs text-[var(--color-text-secondary)] mb-4 text-center">
-          Demo: {DEMO_EMAIL} / {DEMO_PASSWORD}
-        </p>
-
-        <button
-          type="button"
-          onClick={() => {
-            setEmail(DEMO_EMAIL);
-            setPassword(DEMO_PASSWORD);
-          }}
-          className="auth-login-btn w-full mb-3"
-        >
-          Use Demo Credentials
-        </button>
+        {DEMO_ENABLED ? (
+          <>
+            <p className="text-xs text-[var(--color-text-secondary)] mb-4 text-center">
+              Demo: {DEMO_EMAIL} / {DEMO_PASSWORD}
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setEmail(DEMO_EMAIL);
+                setPassword(DEMO_PASSWORD);
+              }}
+              className="auth-login-btn w-full mb-3"
+            >
+              Use Demo Credentials
+            </button>
+          </>
+        ) : null}
 
         <input
           type="email"

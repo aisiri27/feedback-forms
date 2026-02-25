@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const isDemoEnabled = process.env.NODE_ENV !== "production";
 
 module.exports = function authMiddleware(req, res, next) {
   const header = req.headers.authorization || "";
@@ -10,13 +11,17 @@ module.exports = function authMiddleware(req, res, next) {
     return res.status(401).json({ message: "No token provided" });
   }
 
-  if (token === "demo-token") {
+  if (token === "demo-token" && isDemoEnabled) {
     req.user = {
       userId: "000000000000000000000001",
       id: "000000000000000000000001",
       email: "demo@chiac.local",
     };
     return next();
+  }
+
+  if (token === "demo-token" && !isDemoEnabled) {
+    return res.status(401).json({ message: "Invalid or expired token" });
   }
 
   try {
